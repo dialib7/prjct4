@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrie-PC Eigenschaften Quiz</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f5f5f5;
+}
+
+h1 {
+    text-align: center;
+}
+
+#eingabeBereich {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    font-size: 18px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+#meldung {
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#fortschritt {
+    margin-bottom: 20px;
+}
+
+.begriff {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-size: 20px;
+    border-left: 5px solid #ccc;
+}
+
+.verborgen {
+    background: #ddd;
+    color: #ddd;
+    user-select: none;
+}
+
+.gefunden {
+    background: #dff0d8;
+    border-left-color: green;
+    color: black;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Eigenschaften eines Industrie-PCs</h1>
+
+<div id="fortschritt"></div>
+
+<div id="eingabeBereich">
+    <input type="text" id="eingabe" placeholder="Eigenschaft eingeben...">
+    <button onclick="pruefen()">Prüfen</button>
+    <button onclick="alleAnzeigen()">Alle anzeigen</button>
+</div>
+
+<div id="meldung"></div>
+
+<div id="liste"></div>
+
+<script>
+
+// Jede Zeile:
+// [Anzuzeigender Begriff, [mögliche Eingaben]]
+
+const begriffe = [
+
+["Lüfterlos", [
+    "lüfterlos",
+    "ohne lüfter",
+    "passiv gekühlt"
+]],
+
+["Staubgeschützt", [
+    "staubgeschützt",
+    "staubunempfindlich",
+    "schutz vor staub",
+    "robust gegen staub",
+    "staubdicht",
+    "staub",
+    "staubresistent"
+]],
+
+["Ölbeständig", [
+    "ölbeständig",
+    "ölgeschützt",
+    "beständig gegen öl",
+    "unempfindlich gegen öl",
+    "oelbestaendig",
+    "öl"
+]],
+
+["Feuchtigkeitsgeschützt", [
+    "feuchtigkeitsgeschützt",
+    "feuchtigkeitsbeständig",
+    "feuchtigkeitsresistent",
+    "spritzwassergeschützt",
+    "schutz vor feuchtigkeit"
+]],
+
+["Vibrationsfest", [
+    "vibrationsfest",
+    "erschütterungsfest",
+    "schwingungsfest"
+]],
+
+["Robustes Gehäuse", [
+    "robust",
+    "stabil",
+    "widerstandsfähig",
+    "robustes gehäuse"
+]],
+
+["24/7-Betrieb", [
+    "24 7 betrieb",
+    "dauerbetrieb",
+    "rund um die uhr",
+    "durchgehender betrieb"
+]],
+
+["Hohe Zuverlässigkeit", [
+    "zuverlässig",
+    "ausfallsicher",
+    "betriebssicher"
+]],
+
+["Großer Temperaturbereich", [
+    "großer temperaturbereich",
+    "temperaturbeständig",
+    "hitzebeständig",
+    "kältebeständig"
+]],
+
+["Lange Verfügbarkeit", [
+    "lange verfügbar",
+    "langzeitverfügbarkeit",
+    "lange ersatzteilversorgung",
+    "ersatzteile",
+    "haltbarkeit"
+]],
+
+["Formfaktoren", [
+    "hutschiene",
+    "hutschienenmontage",
+    "din schiene",
+    "montage auf hutschiene",
+    "wandmontage",
+    "an der wand montierbar",
+    "Formfaktor",
+    "from"
+]],
+
+["Energieeffizient", [
+    "energieeffizient",
+    "stromsparend",
+    "geringer stromverbrauch"
+]],
+
+["Viele Schnittstellen", [
+    "viele schnittstellen",
+    "viele anschlüsse",
+    "zahlreiche ports"
+]],
+
+["Serielle Schnittstellen", [
+    "rs232",
+    "rs485",
+    "serielle schnittstellen",
+    "com port"
+]],
+
+["Industrie-Netzwerke", [
+    "profinet",
+    "ethernet ip",
+    "industrienetzwerk",
+    "feldbus"
+]],
+
+["SSD statt HDD", [
+    "ssd",
+    "flash speicher",
+    "keine festplatte"
+]],
+
+["EMV-fest", [
+    "emv",
+    "elektromagnetische verträglichkeit",
+    "störfest",
+    "unempfindlich gegen störungen"
+]],
+
+["Kompakte Bauform", [
+    "kompakt",
+    "platzsparend",
+    "kleine bauform"
+]],
+
+["Industrietauglich", [
+    "industrietauglich",
+    "für industrie geeignet",
+    "industrieeinsatz"
+]],
+
+["Wartungsarm", [
+    "wartungsarm",
+    "wenig wartung",
+    "geringer wartungsaufwand",
+    "wartungsfreundlich"
+]]
+
+];
+
+const gefunden = new Array(begriffe.length).fill(false);
+
+function alleAnzeigen() {
+
+    loesungAngezeigt = true;
+
+    document.getElementById("meldung").innerHTML =
+        "📋 Nicht gefundene Eigenschaften wurden aufgedeckt.";
+
+    renderListe();
+}
+
+let loesungAngezeigt = false;
+
+function renderListe() {
+
+    const liste = document.getElementById("liste");
+    liste.innerHTML = "";
+
+    begriffe.forEach((eintrag, index) => {
+
+        const div = document.createElement("div");
+
+        if (gefunden[index]) {
+
+            div.className = "begriff gefunden";
+            div.textContent = "✅ " + eintrag[0];
+
+        } else if (loesungAngezeigt) {
+
+            div.className = "begriff";
+            div.style.background = "#fff3cd";
+            div.style.borderLeftColor = "#ff9800";
+            div.textContent = "🟡 " + eintrag[0];
+
+        } else {
+
+            div.className = "begriff verborgen";
+            div.textContent = "████████████████";
+        }
+
+        liste.appendChild(div);
+    });
+
+    const anzahlGefunden = gefunden.filter(x => x).length;
+
+    document.getElementById("fortschritt").innerHTML =
+        `<strong>Gefunden:</strong> ${anzahlGefunden} von ${begriffe.length}`;
+}
+function normalisieren(text) {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/ä/g,"ae")
+        .replace(/ö/g,"oe")
+        .replace(/ü/g,"ue")
+        .replace(/ß/g,"ss");
+}
+
+function pruefen() {
+
+    const feld = document.getElementById("eingabe");
+    const eingabe = normalisieren(feld.value);
+
+    let treffer = false;
+
+    begriffe.forEach((eintrag, index) => {
+
+        if (gefunden[index]) return;
+
+        const loesungen = eintrag[1].map(normalisieren);
+
+        if (loesungen.includes(eingabe)) {
+
+            gefunden[index] = true;
+            treffer = true;
+        }
+    });
+
+    if (treffer) {
+        document.getElementById("meldung").innerHTML =
+            "✅ Treffer!";
+    } else {
+        document.getElementById("meldung").innerHTML =
+            "❌ Kein Treffer";
+    }
+
+    feld.value = "";
+    feld.focus();
+
+    renderListe();
+}
+
+document.getElementById("eingabe").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        pruefen();
+    }
+});
+
+renderListe();
+
+</script>
+
+</body>
+</html>
