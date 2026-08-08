@@ -24,6 +24,12 @@ h1 {
     margin-bottom: 20px;
 }
 
+#liste {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
 input {
     flex: 1;
     padding: 10px;
@@ -154,7 +160,8 @@ const begriffe = [
     "großer temperaturbereich",
     "temperaturbeständig",
     "hitzebeständig",
-    "kältebeständig"
+    "kältebeständig",
+    "temperatur"
 ]],
 
 ["Lange Verfügbarkeit", [
@@ -162,7 +169,8 @@ const begriffe = [
     "langzeitverfügbarkeit",
     "lange ersatzteilversorgung",
     "ersatzteile",
-    "haltbarkeit"
+    "haltbarkeit",
+    "haltbar"
 ]],
 
 ["Formfaktoren", [
@@ -173,7 +181,7 @@ const begriffe = [
     "wandmontage",
     "an der wand montierbar",
     "Formfaktor",
-    "from"
+    "form"
 ]],
 
 ["Energieeffizient", [
@@ -192,20 +200,25 @@ const begriffe = [
     "rs232",
     "rs485",
     "serielle schnittstellen",
-    "com port"
+    "com port",
+    "seriell"
 ]],
 
 ["Industrie-Netzwerke", [
     "profinet",
     "ethernet ip",
     "industrienetzwerk",
-    "feldbus"
+    "feldbus",
+    "ethercat",
+    "modbus",
+    "netzwerk"
 ]],
 
 ["SSD statt HDD", [
     "ssd",
     "flash speicher",
-    "keine festplatte"
+    "keine festplatte",
+    "speicher ohne bewegliche teile"
 ]],
 
 ["EMV-fest", [
@@ -285,6 +298,7 @@ function renderListe() {
     document.getElementById("fortschritt").innerHTML =
         `<strong>Gefunden:</strong> ${anzahlGefunden} von ${begriffe.length}`;
 }
+
 function normalisieren(text) {
     return text
         .toLowerCase()
@@ -311,6 +325,7 @@ function pruefen() {
         if (loesungen.includes(eingabe)) {
 
             gefunden[index] = true;
+            //gefundeneBegriffe.push(index);
             treffer = true;
         }
     });
